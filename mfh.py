@@ -1,41 +1,76 @@
 #!/usr/bin/env python3
-import os
+import argparse
 import sys
-from tools.osint import osint_menu
-from tools.scanner import scan_menu
-from tools.crypto import crypto_menu
-from tools.hash_tools import hash_menu
+import os
+import logging
+from datetime import datetime
+from colorama import init, Fore, Style
+
+init(autoreset=True)
+
+# Configurar logging
+LOG_DIR = "logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+logging.basicConfig(
+    filename=f"{LOG_DIR}/mfh_{datetime.now().strftime('%Y%m%d')}.log",
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 def show_banner():
-    os.system('clear' if os.name == 'posix' else 'cls')
-    print("=========================================")
-    print("   __  ___  _   _   _____ _______        ")
-    print("  |  \/  | | | | | |_   _|__   __|       ")
-    print("  | \  / | | |_| |   | |    | |          ")
-    print("  | |\/| | |  _  |   | |    | |          ")
-    print("  |_|  |_| |_| |_|   |_|    |_|          ")
-    print("                                          ")
-    print("   MFH TOOLS PRO - Security Suite v1.0   ")
-    print("   https://github.com/Falconmx1/MFH-TOOLS-PRO")
-    print("=========================================")
+    banner = f"""
+{Fore.RED}{'='*50}
+   __  ___  _   _   _____ _______        
+  |  \/  | | | | | |_   _|__   __|       
+  | \  / | | |_| |   | |    | |          
+  | |\/| | |  _  |   | |    | |          
+  |_|  |_| |_| |_|   |_|    |_|          
+                                          
+   {Fore.GREEN}MFH TOOLS PRO - Security Suite v2.0{Fore.RED}
+   {Fore.CYAN}https://github.com/Falconmx1/MFH-TOOLS-PRO{Fore.RED}
+{Fore.RED}{'='*50}{Style.RESET_ALL}
+    """
+    print(banner)
 
-def main_menu():
-    while True:
+def main():
+    parser = argparse.ArgumentParser(description="MFH TOOLS PRO - Suite de ciberseguridad")
+    parser.add_argument("--tool", "-t", help="Ejecutar herramienta específica")
+    parser.add_argument("--target", "-T", help="Target para la herramienta")
+    parser.add_argument("--scan", "-s", help="Escaneo de puertos (ej: 192.168.1.1)")
+    parser.add_argument("--ports", "-p", default="1-1000", help="Rango de puertos")
+    parser.add_argument("--hash", help="Generar hash de un texto")
+    parser.add_argument("--whois", help="Consulta whois de dominio")
+    parser.add_argument("--geoip", help="GeoIP de IP")
+    parser.add_argument("--report", "-r", help="Generar reporte en PDF/HTML")
+    
+    args = parser.parse_args()
+    
+    if len(sys.argv) == 1:
         show_banner()
-        print("\n[+] SELECCIONA UNA OPCIÓN:")
-        print("1. OSINT (info dominios, emails)")
-        print("2. Escáner de Puertos")
-        print("3. Cifrado AES/GPG")
-        print("4. Herramientas Hash (MD5, SHA)")
-        print("5. Salir")
-        
-        op = input("\n Opción: ")
-        if op == "1": osint_menu()
-        elif op == "2": scan_menu()
-        elif op == "3": crypto_menu()
-        elif op == "4": hash_menu()
-        elif op == "5": sys.exit(0)
-        else: input("Opción no válida. Enter para continuar...")
+        from tools.menu import interactive_menu
+        interactive_menu()
+        return
+    
+    # Modo CLI
+    logging.info(f"Ejecución CLI con args: {vars(args)}")
+    
+    if args.scan:
+        from tools.scanner import quick_scan
+        quick_scan(args.scan, args.ports)
+    elif args.hash:
+        from tools.hash_tools import generate_hash
+        generate_hash(args.hash)
+    elif args.whois:
+        from tools.whois_geo import get_whois
+        get_whois(args.whois)
+    elif args.geoip:
+        from tools.whois_geo import get_geoip
+        get_geoip(args.geoip)
+    elif args.report:
+        from tools.report import generate_report
+        generate_report(args.report)
+    else:
+        print(f"{Fore.RED}[!] Herramienta no reconocida. Usa --help")
 
 if __name__ == "__main__":
-    main_menu()
+    main()
