@@ -31,3 +31,13 @@ python3 mfh.py --hash "Hola Mundo"
 python3 mfh.py --whois google.com
 python3 mfh.py --geoip 8.8.8.8
 python3 mfh.py --report html
+
+🧪 Ejemplos de uso
+
+Escaneo de puertos:
+
+python3 mfh.py -t scanner --target 192.168.1.1 -p 1-1000
+
+Crackear hash MD5 con diccionario:
+
+python3 mfh.py -t hash --hash "5d41402abc4b2a76b9719d911017c592" --wordlist rockyou.txt
