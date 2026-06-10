@@ -1,3 +1,12 @@
 cryptography==44.0.0
-socket  # built-in
-hashlib # built-in
+python-nmap==0.7.1
+requests==2.32.3
+dnspython==2.7.0
+whois==0.9.4
+geoip2==4.8.1
+Pillow==10.4.0
+python-docx==1.1.2
+fpdf==1.7.2
+colorama==0.4.6
+pycryptodome==3.21.0
+metadate==2.0.0
